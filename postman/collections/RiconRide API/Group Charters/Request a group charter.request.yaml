@@ -1,0 +1,31 @@
+$kind: http-request
+description: Public. Created as `pending_approval`; dispatch sets the fare per person. Returns the invite code.
+url: "{{baseUrl}}/api/groups"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "KNUST Alumni Annual Homecoming Trip",
+      "tripType": "Church / Alumni",
+      "origin": "Accra (Circle Station)",
+      "destination": "Kumasi (KNUST Campus)",
+      "pickupLocation": "Legon Shell Landmark / University Gate",
+      "pickupCoordinates": {
+        "lat": 5.6508,
+        "lng": -0.187
+      },
+      "travelDate": "2026-12-25",
+      "preferredDepartureTime": "06:00 AM",
+      "targetTravelers": 30,
+      "organizer": {
+        "name": "Kofi Mensah Boateng",
+        "phone": "0539943305",
+        "email": "kofi@example.com"
+      }
+    }
+settings: {}
+examples: ./.resources/Request a group charter.resources/examples
+order: 1000

@@ -1,0 +1,35 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/rentals/:id/deposit"
+  method: PATCH
+  headers:
+    - key: Authorization
+      value: Bearer <token>
+      description: "Added as a part of security scheme: bearer"
+  pathVariables:
+    - key: id
+      value: 623269a5-f452-f201-031d-3f0613496ae0
+      disabled: false
+      description: "(Required) "
+  body:
+    type: json
+    content: |-
+      {
+        "action": "deduct",
+        "deductions": [
+          {
+            "reason": "Fuel top-up",
+            "amount": 150
+          }
+        ],
+        "inspectionNotes": "Returned with a quarter tank; no damage."
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/plain
+  body:
+    type: text
+    content: ""
+order: 1000

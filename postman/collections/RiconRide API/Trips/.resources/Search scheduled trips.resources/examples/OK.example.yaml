@@ -1,0 +1,22 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/trips?from=Accra&to=Kumasi&date=2026-12-12&passengers=2&operator=op-vip"
+  method: GET
+  queryParams:
+    from: Accra
+    to: Kumasi
+    date: 2026-12-12
+    passengers: "2"
+    operator: op-vip
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/plain
+  body:
+    type: text
+    content: ""
+order: 1000

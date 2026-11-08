@@ -1,0 +1,16 @@
+# Local Postgres for the RiconRide API.
+# WHY port 5434: a native Postgres on this machine owns 5432 and would
+# silently shadow a container published there.
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: riconride
+      POSTGRES_PASSWORD: riconride_dev
+      POSTGRES_DB: riconride
+    ports:
+      - "5434:5432"
+    volumes:
+      - riconride-pg:/var/lib/postgresql/data
+volumes:
+  riconride-pg:

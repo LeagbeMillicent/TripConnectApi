@@ -1,0 +1,5 @@
+$kind: collection
+description: Every Journey, Connected. Intercity bus booking, group charters and vehicle rentals in Ghana. Money is in Ghana Cedi (GH₵, max 2 decimals); phone numbers are Ghana mobiles (0XXXXXXXXX or +233…). Errors are RFC 7807 problem+json; validation errors list fields under `errors`.
+variables:
+  baseUrl: http://localhost:5080
+  bearerToken: ""

@@ -1,0 +1,15 @@
+$kind: http-request
+description: "Public. Always 202 with the same message: boarding links go only to the phone by SMS/WhatsApp, so the response never reveals whether a number has tickets."
+url: "{{baseUrl}}/api/bookings/find-ticket"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "phone": "0539943305"
+    }
+settings: {}
+examples: ./.resources/Find my ticket by phone.resources/examples
+order: 3000

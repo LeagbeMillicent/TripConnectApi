@@ -1,0 +1,21 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/payments/mock/:reference/complete"
+  method: POST
+  pathVariables:
+    - key: reference
+      value: RCP_5e7a724bfb5f413d95533cbfe742c7c9
+      disabled: false
+      description: "(Required) "
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/plain
+  body:
+    type: text
+    content: ""
+order: 1000

@@ -1,0 +1,27 @@
+$kind: http-request
+description: |-
+  CMS. `{id}` is the booking number or id. Send the scanned `qrCodeData` (signature verified) or no body for manual entry. Only confirmed tickets for today's departures.
+
+  **Roles:** gate_marshal, station_master, dispatch_marshal, system_admin.
+url: "{{baseUrl}}/api/bookings/:id/check-in"
+method: PATCH
+headers:
+  Content-Type: application/json
+pathVariables:
+  - key: id
+    value: RC-2026-1234567
+    disabled: false
+    description: "(Required) "
+body:
+  type: json
+  content: |-
+    {
+      "qrCodeData": "RC-2026-1234567|Accra-Kumasi|SEATS:14,15|Kwame Mensah|GH₵220|SIG:<from the ticket>"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Board a passenger (QR scan).resources/examples
+order: 5000

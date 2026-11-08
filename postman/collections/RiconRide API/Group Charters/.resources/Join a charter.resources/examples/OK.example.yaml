@@ -1,0 +1,28 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/groups/:id/join"
+  method: POST
+  pathVariables:
+    - key: id
+      value: 4656b099-0469-2386-93ce-bbee75d60e70
+      disabled: false
+      description: "(Required) "
+  body:
+    type: json
+    content: |-
+      {
+        "name": "Ama Osei",
+        "phone": "0539943305",
+        "emergencyContact": "0241002000",
+        "paymentMethod": "momo",
+        "mobileMoneyProvider": "MTN"
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/plain
+  body:
+    type: text
+    content: ""
+order: 1000

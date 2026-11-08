@@ -1,0 +1,29 @@
+$kind: http-request
+description: |-
+  CMS. `id` defaults to `st-<slug of name>`.
+
+  **Roles:** network_manager, station_master, system_admin.
+url: "{{baseUrl}}/api/terminals"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Takoradi Market Circle Terminal",
+      "city": "Takoradi",
+      "address": "Market Circle",
+      "latitude": 4.8975,
+      "longitude": -1.7603,
+      "activeBayCount": 6,
+      "marshalName": "Esi Arthur",
+      "marshalPhone": "0244000000"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Register a terminal.resources/examples
+order: 2000

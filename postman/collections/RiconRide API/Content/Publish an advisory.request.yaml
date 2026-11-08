@@ -1,0 +1,24 @@
+$kind: http-request
+description: |-
+  CMS. `severity`: info | warning | critical.
+
+  **Roles:** communications, system_admin.
+url: "{{baseUrl}}/api/content/banners"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "N1 diversion at Kasoa",
+      "message": "Expect 30-minute delays on Accra–Cape Coast departures today.",
+      "severity": "warning"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Publish an advisory.resources/examples
+order: 2000

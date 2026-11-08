@@ -1,0 +1,31 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/groups/:id/fare-approval"
+  method: PATCH
+  headers:
+    - key: Authorization
+      value: Bearer <token>
+      description: "Added as a part of security scheme: bearer"
+  pathVariables:
+    - key: id
+      value: 4656b099-0469-2386-93ce-bbee75d60e70
+      disabled: false
+      description: "(Required) "
+  body:
+    type: json
+    content: |-
+      {
+        "approvedFarePerPerson": 145,
+        "assignedCoach": "30-Seater Coaster Bus with AC",
+        "dispatchNotes": "Assigned executive shuttle. Fuel allowance and driver per diem covered.",
+        "status": "planning"
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/plain
+  body:
+    type: text
+    content: ""
+order: 1000

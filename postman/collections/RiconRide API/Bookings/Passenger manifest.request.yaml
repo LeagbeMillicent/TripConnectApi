@@ -1,0 +1,21 @@
+$kind: http-request
+description: |-
+  CMS. Filter by `status` (pending_payment | confirmed | boarded | expired | cancelled | refund_due), `tripId`, `date`; `search` matches booking number, passenger name or phone. Paged (`limit` max 100).
+
+  **Roles:** dispatch_marshal, station_master, gate_marshal, system_admin.
+url: "{{baseUrl}}/api/bookings?search=Kwame&status=confirmed&tripId=trip-acc-kum-01&date=2026-12-12&page=1&limit=25"
+method: GET
+queryParams:
+  search: Kwame
+  status: confirmed
+  tripId: trip-acc-kum-01
+  date: 2026-12-12
+  page: "1"
+  limit: "25"
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Passenger manifest.resources/examples
+order: 2000

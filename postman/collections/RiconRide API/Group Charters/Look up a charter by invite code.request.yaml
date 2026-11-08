@@ -1,0 +1,12 @@
+$kind: http-request
+description: Public. Status, pickup map link, approved fare, confirmed members and seats remaining. No member or organiser contact details.
+url: "{{baseUrl}}/api/groups/code/:code"
+method: GET
+pathVariables:
+  - key: code
+    value: ACC-KUM-7QX2
+    disabled: false
+    description: "(Required) "
+settings: {}
+examples: ./.resources/Look up a charter by invite code.resources/examples
+order: 3000

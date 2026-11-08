@@ -1,0 +1,26 @@
+$kind: http-request
+description: Public. Price = full weeks at the weekly rate + remaining days at the daily rate (capped at a week), + driver fee per day, + refundable deposit. Self-drive needs `driverLicenseNumber`.
+url: "{{baseUrl}}/api/rentals"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "vehicleId": "<vehicle id from GET /api/vehicles>",
+      "startDate": "2026-12-01",
+      "endDate": "2026-12-08",
+      "pickupPoint": "Kotoka International Airport, Terminal 3",
+      "driverOption": "with-driver",
+      "customer": {
+        "name": "Yaw Asante",
+        "phone": "0551234567",
+        "email": "yaw@example.com"
+      },
+      "paymentMethod": "momo",
+      "mobileMoneyProvider": "MTN"
+    }
+settings: {}
+examples: ./.resources/Create a rental agreement.resources/examples
+order: 1000

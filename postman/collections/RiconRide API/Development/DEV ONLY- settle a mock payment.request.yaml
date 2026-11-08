@@ -1,0 +1,13 @@
+$kind: http-request
+name: "DEV ONLY: settle a mock payment"
+description: Exists only while no PAYSTACK_SECRET_KEY is set. Simulates the customer approving the MoMo prompt.
+url: "{{baseUrl}}/api/payments/mock/:reference/complete"
+method: POST
+pathVariables:
+  - key: reference
+    value: RCP_5e7a724bfb5f413d95533cbfe742c7c9
+    disabled: false
+    description: "(Required) "
+settings: {}
+examples: ./.resources/DEV ONLY- settle a mock payment.resources/examples
+order: 1000

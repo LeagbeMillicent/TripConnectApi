@@ -1,0 +1,28 @@
+$kind: http-request
+description: |-
+  CMS. Partial update. Price changes apply to new bookings only. `status`: scheduled | boarding | departed | arrived.
+
+  **Roles:** dispatch_marshal, station_master, system_admin.
+url: "{{baseUrl}}/api/trips/:id"
+method: PATCH
+headers:
+  Content-Type: application/json
+pathVariables:
+  - key: id
+    value: trip-acc-kum-01
+    disabled: false
+    description: "(Required) "
+body:
+  type: json
+  content: |-
+    {
+      "departureTime": "06:00 AM",
+      "status": "boarding"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Update a departure.resources/examples
+order: 4000

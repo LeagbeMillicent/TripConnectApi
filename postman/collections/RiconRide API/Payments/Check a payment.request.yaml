@@ -1,0 +1,12 @@
+$kind: http-request
+description: "Public. If still pending, asks the gateway directly (covers a missed webhook). Status: pending | paid | failed | refund_due."
+url: "{{baseUrl}}/api/payments/verify/:reference"
+method: GET
+pathVariables:
+  - key: reference
+    value: RCP_5e7a724bfb5f413d95533cbfe742c7c9
+    disabled: false
+    description: "(Required) "
+settings: {}
+examples: ./.resources/Check a payment.resources/examples
+order: 3000

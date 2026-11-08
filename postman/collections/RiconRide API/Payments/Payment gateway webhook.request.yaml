@@ -1,0 +1,7 @@
+$kind: http-request
+description: Paystack only. Verifies the HMAC-SHA512 `x-paystack-signature` over the raw body. Idempotent; a short or wrong-currency payment is flagged `refund_due`, never fulfilled.
+url: "{{baseUrl}}/api/payments/webhook"
+method: POST
+settings: {}
+examples: ./.resources/Payment gateway webhook.resources/examples
+order: 2000

@@ -1,0 +1,40 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/trips"
+  method: POST
+  headers:
+    - key: Authorization
+      value: Bearer <token>
+      description: "Added as a part of security scheme: bearer"
+  body:
+    type: json
+    content: |-
+      {
+        "originCity": "Accra",
+        "destinationCity": "Tamale",
+        "originStationId": "st-circle",
+        "destinationStationId": "st-tamale-central",
+        "departureDate": "2026-12-12",
+        "departureTime": "05:00 AM",
+        "duration": "9h 30m",
+        "basePrice": 240,
+        "operatorId": "op-stc",
+        "vehicleType": "Intercity Scania Touring (49-Seater)",
+        "totalSeatsCount": 49,
+        "amenities": [
+          "Air Conditioning",
+          "Luggage Hold"
+        ],
+        "pickupLandmarks": [
+          "Circle Overpass Bay 4"
+        ]
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/plain
+  body:
+    type: text
+    content: ""
+order: 1000

@@ -1,0 +1,19 @@
+$kind: http-request
+description: |-
+  CMS. With no bookings the trip is deleted (204). With bookings it is cancelled, paid tickets become `refund_due` and passengers are notified (200).
+
+  **Roles:** dispatch_marshal, station_master, system_admin.
+url: "{{baseUrl}}/api/trips/:id"
+method: DELETE
+pathVariables:
+  - key: id
+    value: trip-acc-kum-01
+    disabled: false
+    description: "(Required) "
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Cancel or delete a departure.resources/examples
+order: 5000

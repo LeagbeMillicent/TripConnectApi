@@ -1,0 +1,12 @@
+$kind: http-request
+description: Public. Seat map shows occupancy only, never who sits where.
+url: "{{baseUrl}}/api/trips/:id"
+method: GET
+pathVariables:
+  - key: id
+    value: trip-acc-kum-01
+    disabled: false
+    description: "(Required) "
+settings: {}
+examples: ./.resources/Trip details and seat map.resources/examples
+order: 3000

@@ -1,0 +1,27 @@
+$kind: http-request
+description: |-
+  CMS. Partial update; inactive terminals can't be used for new trips.
+
+  **Roles:** network_manager, station_master, system_admin.
+url: "{{baseUrl}}/api/terminals/:id"
+method: PATCH
+headers:
+  Content-Type: application/json
+pathVariables:
+  - key: id
+    value: st-circle
+    disabled: false
+    description: "(Required) "
+body:
+  type: json
+  content: |-
+    {
+      "activeBayCount": 14
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Update a terminal.resources/examples
+order: 3000

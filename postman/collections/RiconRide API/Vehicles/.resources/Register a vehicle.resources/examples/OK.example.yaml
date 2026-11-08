@@ -1,0 +1,39 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/vehicles"
+  method: POST
+  headers:
+    - key: Authorization
+      value: Bearer <token>
+      description: "Added as a part of security scheme: bearer"
+  body:
+    type: json
+    content: |-
+      {
+        "name": "Toyota Land Cruiser Prado TX",
+        "category": "SUV",
+        "licensePlate": "GW 8942-23",
+        "dailyPrice": 950,
+        "weeklyPrice": 5800,
+        "securityDeposit": 1000,
+        "withDriverAllowed": true,
+        "selfDriveAllowed": true,
+        "driverFeePerDay": 200,
+        "features": [
+          "4x4 Drive",
+          "Leather Interior",
+          "GPS Tracker",
+          "Comprehensive Insurance"
+        ],
+        "dvlaRoadworthinessExpiry": "2027-05-15",
+        "images": []
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/plain
+  body:
+    type: text
+    content: ""
+order: 1000

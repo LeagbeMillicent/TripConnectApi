@@ -1,0 +1,23 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/bookings/ticket/:bookingNumber?token=<token from the SMS link>"
+  method: GET
+  queryParams:
+    token: <token from the SMS link>
+  pathVariables:
+    - key: bookingNumber
+      value: RC-2026-1234567
+      disabled: false
+      description: "(Required) "
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/plain
+  body:
+    type: text
+    content: ""
+order: 1000

@@ -1,0 +1,6 @@
+workflows:
+  syncSpecToCollection:
+    - spec: ../postman/specs/riconride-openapi.json
+      collection: ../postman/collections/RiconRide API
+      options:
+        folderStrategy: Tags

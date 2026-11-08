@@ -1,0 +1,7 @@
+$kind: http-request
+description: 200 when the database is reachable.
+url: "{{baseUrl}}/health"
+method: GET
+settings: {}
+examples: ./.resources/Health check.resources/examples
+order: 1000

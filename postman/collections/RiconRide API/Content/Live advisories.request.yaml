@@ -1,0 +1,7 @@
+$kind: http-request
+description: Public. Active banners inside their time window.
+url: "{{baseUrl}}/api/content/banners"
+method: GET
+settings: {}
+examples: ./.resources/Live advisories.resources/examples
+order: 1000

@@ -1,0 +1,2458 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "RiconRide API",
+    "description": "Every Journey, Connected. Intercity bus booking, group charters and vehicle rentals in Ghana. Money is in Ghana Cedi (GH\u20b5, max 2 decimals); phone numbers are Ghana mobiles (0XXXXXXXXX or +233\u2026). Errors are RFC 7807 problem+json; validation errors list fields under `errors`.",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5080",
+      "description": "Local development"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Health check",
+        "description": "200 when the database is reachable.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/dashboard-stats": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Operations dashboard KPIs",
+        "description": "CMS. Every figure is a count or sum of real rows: gross volume (all time, today), seats booked today, fleet in transit, pending fare approvals, payments awaiting refund.\n\n**Roles:** executive, system_admin.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Operator login",
+        "description": "Returns a bearer JWT and also sets the HttpOnly `rr_session` cookie (SameSite=Strict). 5 wrong passwords lock the account for 15 minutes (423).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              },
+              "example": {
+                "email": "admin@riconride.com",
+                "password": "dev-admin-pass-2026"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Operator logout",
+        "description": "Clears the session cookie. Bearer tokens simply expire.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Current operator",
+        "description": "The signed-in operator's profile and role.\n\n**Roles:** system_admin, dispatch_marshal, station_master, gate_marshal, fleet_manager, network_manager, communications, executive.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/trips": {
+      "get": {
+        "tags": [
+          "Trips"
+        ],
+        "summary": "Search scheduled trips",
+        "description": "Public. Upcoming scheduled/boarding trips; `passengers` hides trips without enough free seats. Cities match case-insensitively.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Accra"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Kumasi"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "2026-12-12"
+          },
+          {
+            "name": "passengers",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            },
+            "example": 2
+          },
+          {
+            "name": "operator",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "op-vip"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Trips"
+        ],
+        "summary": "Schedule a departure",
+        "description": "CMS. `departureTime` like `06:30 AM`, `duration` like `4h 30m`, `basePrice` in GH\u20b5 (max 2 decimals).\n\n**Roles:** dispatch_marshal, station_master, system_admin.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripWrite"
+              },
+              "example": {
+                "originCity": "Accra",
+                "destinationCity": "Tamale",
+                "originStationId": "st-circle",
+                "destinationStationId": "st-tamale-central",
+                "departureDate": "2026-12-12",
+                "departureTime": "05:00 AM",
+                "duration": "9h 30m",
+                "basePrice": 240,
+                "operatorId": "op-stc",
+                "vehicleType": "Intercity Scania Touring (49-Seater)",
+                "totalSeatsCount": 49,
+                "amenities": [
+                  "Air Conditioning",
+                  "Luggage Hold"
+                ],
+                "pickupLandmarks": [
+                  "Circle Overpass Bay 4"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/trips/{id}": {
+      "get": {
+        "tags": [
+          "Trips"
+        ],
+        "summary": "Trip details and seat map",
+        "description": "Public. Seat map shows occupancy only, never who sits where.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "trip-acc-kum-01"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Trips"
+        ],
+        "summary": "Update a departure",
+        "description": "CMS. Partial update. Price changes apply to new bookings only. `status`: scheduled | boarding | departed | arrived.\n\n**Roles:** dispatch_marshal, station_master, system_admin.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "trip-acc-kum-01"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripWrite"
+              },
+              "example": {
+                "departureTime": "06:00 AM",
+                "status": "boarding"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Trips"
+        ],
+        "summary": "Cancel or delete a departure",
+        "description": "CMS. With no bookings the trip is deleted (204). With bookings it is cancelled, paid tickets become `refund_due` and passengers are notified (200).\n\n**Roles:** dispatch_marshal, station_master, system_admin.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "trip-acc-kum-01"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/trips/{id}/hold-seat": {
+      "post": {
+        "tags": [
+          "Trips"
+        ],
+        "summary": "Hold seats during checkout",
+        "description": "Public. Locks seats for 10 minutes for `sessionId`. Re-posting replaces that session's holds. 409 lists `unavailableSeats`.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "trip-acc-kum-01"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HoldRequest"
+              },
+              "example": {
+                "seatNumbers": [
+                  12,
+                  13
+                ],
+                "sessionId": "sess_891273"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/bookings": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Create a ticket reservation",
+        "description": "Public. Creates a `pending_payment` booking and opens the payment; seats are released if unpaid after 15 minutes. Pass the `sessionId` used for hold-seat to convert held seats. `qrCodeData` stays null until paid.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBooking"
+              },
+              "example": {
+                "tripId": "trip-acc-kum-01",
+                "selectedSeatNumbers": [
+                  14,
+                  15
+                ],
+                "passengers": [
+                  {
+                    "fullName": "Kwame Mensah",
+                    "phone": "0539943305",
+                    "gender": "male"
+                  },
+                  {
+                    "fullName": "Akua Serwaa",
+                    "phone": "0241002000",
+                    "gender": "female"
+                  }
+                ],
+                "paymentMethod": "momo",
+                "mobileMoneyNumber": "0539943305",
+                "mobileMoneyProvider": "MTN",
+                "sessionId": "sess_891273"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Passenger manifest",
+        "description": "CMS. Filter by `status` (pending_payment | confirmed | boarded | expired | cancelled | refund_due), `tripId`, `date`; `search` matches booking number, passenger name or phone. Paged (`limit` max 100).\n\n**Roles:** dispatch_marshal, station_master, gate_marshal, system_admin.",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Kwame"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "confirmed"
+          },
+          {
+            "name": "tripId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "trip-acc-kum-01"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "2026-12-12"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            },
+            "example": 25
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/bookings/find-ticket": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Find my ticket by phone",
+        "description": "Public. Always 202 with the same message: boarding links go only to the phone by SMS/WhatsApp, so the response never reveals whether a number has tickets.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FindTicket"
+              },
+              "example": {
+                "phone": "0539943305"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/bookings/ticket/{bookingNumber}": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Open a ticket from its link",
+        "description": "Public. The `token` from the SMS/WhatsApp link is required; wrong tokens get 404.",
+        "parameters": [
+          {
+            "name": "bookingNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "RC-2026-1234567"
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "<token from the SMS link>"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/bookings/{id}/check-in": {
+      "patch": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Board a passenger (QR scan)",
+        "description": "CMS. `{id}` is the booking number or id. Send the scanned `qrCodeData` (signature verified) or no body for manual entry. Only confirmed tickets for today's departures.\n\n**Roles:** gate_marshal, station_master, dispatch_marshal, system_admin.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "RC-2026-1234567"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CheckIn"
+                  }
+                ]
+              },
+              "example": {
+                "qrCodeData": "RC-2026-1234567|Accra-Kumasi|SEATS:14,15|Kwame Mensah|GH\u20b5220|SIG:<from the ticket>"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/groups": {
+      "post": {
+        "tags": [
+          "Group Charters"
+        ],
+        "summary": "Request a group charter",
+        "description": "Public. Created as `pending_approval`; dispatch sets the fare per person. Returns the invite code.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGroup"
+              },
+              "example": {
+                "name": "KNUST Alumni Annual Homecoming Trip",
+                "tripType": "Church / Alumni",
+                "origin": "Accra (Circle Station)",
+                "destination": "Kumasi (KNUST Campus)",
+                "pickupLocation": "Legon Shell Landmark / University Gate",
+                "pickupCoordinates": {
+                  "lat": 5.6508,
+                  "lng": -0.187
+                },
+                "travelDate": "2026-12-25",
+                "preferredDepartureTime": "06:00 AM",
+                "targetTravelers": 30,
+                "organizer": {
+                  "name": "Kofi Mensah Boateng",
+                  "phone": "0539943305",
+                  "email": "kofi@example.com"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/groups/{id}/fare-approval": {
+      "patch": {
+        "tags": [
+          "Group Charters"
+        ],
+        "summary": "Approve the charter fare",
+        "description": "CMS. Sets fare per person, coach and notes. `status`: planning | confirmed | cancelled. The fare is locked once anyone has joined.\n\n**Roles:** dispatch_marshal, system_admin.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "<charter id from POST /api/groups>"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FareApproval"
+              },
+              "example": {
+                "approvedFarePerPerson": 145,
+                "assignedCoach": "30-Seater Coaster Bus with AC",
+                "dispatchNotes": "Assigned executive shuttle. Fuel allowance and driver per diem covered.",
+                "status": "planning"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/groups/code/{code}": {
+      "get": {
+        "tags": [
+          "Group Charters"
+        ],
+        "summary": "Look up a charter by invite code",
+        "description": "Public. Status, pickup map link, approved fare, confirmed members and seats remaining. No member or organiser contact details.",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "ACC-KUM-7QX2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/groups/{id}/join": {
+      "post": {
+        "tags": [
+          "Group Charters"
+        ],
+        "summary": "Join a charter",
+        "description": "Public. Only after fare approval. Reserves a place for 15 minutes pending payment; one active place per phone.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "<charter id from POST /api/groups>"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinGroup"
+              },
+              "example": {
+                "name": "Ama Osei",
+                "phone": "0539943305",
+                "emergencyContact": "0241002000",
+                "paymentMethod": "momo",
+                "mobileMoneyProvider": "MTN"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/vehicles": {
+      "get": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "Rental vehicle catalogue",
+        "description": "Public. Filters: `category` (SUV | Bus | Sedan | Pickup | Van), `driverOption` (self-drive | with-driver), `availability=available` with optional `startDate`/`endDate`. Vehicles with lapsed DVLA roadworthiness are never listed.",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "SUV"
+          },
+          {
+            "name": "driverOption",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "with-driver"
+          },
+          {
+            "name": "availability",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "available"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "2026-12-01"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "2026-12-08"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Vehicles"
+        ],
+        "summary": "Register a vehicle",
+        "description": "CMS. Prices in GH\u20b5. Images must be https URLs. Plate must be unique.\n\n**Roles:** fleet_manager, system_admin.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehicleWrite"
+              },
+              "example": {
+                "name": "Toyota Land Cruiser Prado TX",
+                "category": "SUV",
+                "licensePlate": "GW 8942-23",
+                "dailyPrice": 950,
+                "weeklyPrice": 5800,
+                "securityDeposit": 1000,
+                "withDriverAllowed": true,
+                "selfDriveAllowed": true,
+                "driverFeePerDay": 200,
+                "features": [
+                  "4x4 Drive",
+                  "Leather Interior",
+                  "GPS Tracker",
+                  "Comprehensive Insurance"
+                ],
+                "dvlaRoadworthinessExpiry": "2027-05-15",
+                "images": []
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/rentals": {
+      "post": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Create a rental agreement",
+        "description": "Public. Price = full weeks at the weekly rate + remaining days at the daily rate (capped at a week), + driver fee per day, + refundable deposit. Self-drive needs `driverLicenseNumber`.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRental"
+              },
+              "example": {
+                "vehicleId": "<vehicle id from GET /api/vehicles>",
+                "startDate": "2026-12-01",
+                "endDate": "2026-12-08",
+                "pickupPoint": "Kotoka International Airport, Terminal 3",
+                "driverOption": "with-driver",
+                "customer": {
+                  "name": "Yaw Asante",
+                  "phone": "0551234567",
+                  "email": "yaw@example.com"
+                },
+                "paymentMethod": "momo",
+                "mobileMoneyProvider": "MTN"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/rentals/{id}/deposit": {
+      "patch": {
+        "tags": [
+          "Rentals"
+        ],
+        "summary": "Settle the security deposit",
+        "description": "CMS. `action`: release | deduct | forfeit. The refund goes back through the gateway to the original payment method. A deposit can only be settled once.\n\n**Roles:** fleet_manager, system_admin.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "<rental id from POST /api/rentals>"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepositSettlement"
+              },
+              "example": {
+                "action": "deduct",
+                "deductions": [
+                  {
+                    "reason": "Fuel top-up",
+                    "amount": 150
+                  }
+                ],
+                "inspectionNotes": "Returned with a quarter tank; no damage."
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/terminals": {
+      "get": {
+        "tags": [
+          "Terminals"
+        ],
+        "summary": "List terminals",
+        "description": "Public. Includes a Google Maps directions link and marshal contact.",
+        "parameters": [
+          {
+            "name": "city",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Accra"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Terminals"
+        ],
+        "summary": "Register a terminal",
+        "description": "CMS. `id` defaults to `st-<slug of name>`.\n\n**Roles:** network_manager, station_master, system_admin.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerminalWrite"
+              },
+              "example": {
+                "name": "Takoradi Market Circle Terminal",
+                "city": "Takoradi",
+                "address": "Market Circle",
+                "latitude": 4.8975,
+                "longitude": -1.7603,
+                "activeBayCount": 6,
+                "marshalName": "Esi Arthur",
+                "marshalPhone": "0244000000"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/terminals/{id}": {
+      "patch": {
+        "tags": [
+          "Terminals"
+        ],
+        "summary": "Update a terminal",
+        "description": "CMS. Partial update; inactive terminals can't be used for new trips.\n\n**Roles:** network_manager, station_master, system_admin.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "st-circle"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerminalWrite"
+              },
+              "example": {
+                "activeBayCount": 14
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/content/banners": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "summary": "Live advisories",
+        "description": "Public. Active banners inside their time window.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "summary": "Publish an advisory",
+        "description": "CMS. `severity`: info | warning | critical.\n\n**Roles:** communications, system_admin.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BannerWrite"
+              },
+              "example": {
+                "title": "N1 diversion at Kasoa",
+                "message": "Expect 30-minute delays on Accra\u2013Cape Coast departures today.",
+                "severity": "warning"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/content/faqs": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "summary": "FAQs",
+        "description": "Public. Published FAQs, optional `category` filter.",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Payments"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "summary": "Add an FAQ",
+        "description": "CMS.\n\n**Roles:** communications, system_admin.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FaqWrite"
+              },
+              "example": {
+                "question": "Can I pay with Telecel Cash?",
+                "answer": "Yes. MTN MoMo, Telecel Cash, AT Money, Visa and Mastercard are accepted.",
+                "category": "Payments"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/operators": {
+      "get": {
+        "tags": [
+          "Transport Operators"
+        ],
+        "summary": "List transport operators",
+        "description": "Public. Active operators. `rating` is null until a real review system exists.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Transport Operators"
+        ],
+        "summary": "Register a transport operator",
+        "description": "CMS. `id` defaults to `op-<slug of name>`. Rating is not writable.\n\n**Roles:** network_manager, system_admin.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperatorWrite"
+              },
+              "example": {
+                "name": "Metro Mass Transit",
+                "isVerified": true
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/operators/{id}": {
+      "patch": {
+        "tags": [
+          "Transport Operators"
+        ],
+        "summary": "Update a transport operator",
+        "description": "CMS. Deactivating stops new trips under it; existing trips are unaffected. The id cannot change.\n\n**Roles:** network_manager, system_admin.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "op-vip"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperatorWrite"
+              },
+              "example": {
+                "isActive": false
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/payments/initialize": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Open (or retry) a payment",
+        "description": "Public. `referenceType`: ticket | charter | rental; `referenceId` is the booking number, charter member id or rental number. The amount comes from the order; a different `amount` is rejected (422).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitializeRequest"
+              },
+              "example": {
+                "referenceType": "ticket",
+                "referenceId": "RC-2026-1234567",
+                "amount": 220,
+                "currency": "GHS",
+                "customerEmail": "customer@riconride.com",
+                "customerPhone": "0539943305",
+                "paymentNetwork": "MTN"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/payments/webhook": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Payment gateway webhook",
+        "description": "Paystack only. Verifies the HMAC-SHA512 `x-paystack-signature` over the raw body. Idempotent; a short or wrong-currency payment is flagged `refund_due`, never fulfilled.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/payments/verify/{reference}": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Check a payment",
+        "description": "Public. If still pending, asks the gateway directly (covers a missed webhook). Status: pending | paid | failed | refund_due.",
+        "parameters": [
+          {
+            "name": "reference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "RCP_5e7a724bfb5f413d95533cbfe742c7c9"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/payments/mock/{reference}/complete": {
+      "post": {
+        "tags": [
+          "Development"
+        ],
+        "summary": "DEV ONLY: settle a mock payment",
+        "description": "Exists only while no PAYSTACK_SECRET_KEY is set. Simulates the customer approving the MoMo prompt.",
+        "parameters": [
+          {
+            "name": "reference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "RCP_5e7a724bfb5f413d95533cbfe742c7c9"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BannerWrite": {
+        "required": [
+          "title",
+          "message",
+          "severity",
+          "linkUrl",
+          "startsAt",
+          "endsAt",
+          "isActive"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "message": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "severity": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "linkUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "startsAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "isActive": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        }
+      },
+      "CheckIn": {
+        "required": [
+          "qrCodeData"
+        ],
+        "type": "object",
+        "properties": {
+          "qrCodeData": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "Coordinates": {
+        "required": [
+          "lat",
+          "lng"
+        ],
+        "type": "object",
+        "properties": {
+          "lat": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "lng": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "CreateBooking": {
+        "required": [
+          "tripId",
+          "selectedSeatNumbers",
+          "passengers",
+          "paymentMethod",
+          "mobileMoneyNumber",
+          "mobileMoneyProvider",
+          "customerEmail",
+          "sessionId"
+        ],
+        "type": "object",
+        "properties": {
+          "tripId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "selectedSeatNumbers": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          "passengers": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/PassengerIn"
+            }
+          },
+          "paymentMethod": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mobileMoneyNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mobileMoneyProvider": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "customerEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sessionId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CreateGroup": {
+        "required": [
+          "name",
+          "tripType",
+          "origin",
+          "destination",
+          "pickupLocation",
+          "pickupCoordinates",
+          "travelDate",
+          "preferredDepartureTime",
+          "targetTravelers",
+          "organizer"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "tripType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "origin": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "destination": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "pickupLocation": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "pickupCoordinates": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Coordinates"
+              }
+            ]
+          },
+          "travelDate": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "preferredDepartureTime": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "targetTravelers": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "organizer": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Organizer"
+              }
+            ]
+          }
+        }
+      },
+      "CreateRental": {
+        "required": [
+          "vehicleId",
+          "startDate",
+          "endDate",
+          "pickupPoint",
+          "driverOption",
+          "customer",
+          "driverLicenseNumber",
+          "paymentMethod",
+          "mobileMoneyProvider"
+        ],
+        "type": "object",
+        "properties": {
+          "vehicleId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "startDate": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "endDate": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "pickupPoint": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "driverOption": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "customer": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Customer"
+              }
+            ]
+          },
+          "driverLicenseNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "paymentMethod": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mobileMoneyProvider": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "Customer": {
+        "required": [
+          "name",
+          "phone",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "Deduction": {
+        "required": [
+          "reason",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "DepositSettlement": {
+        "required": [
+          "action",
+          "deductions",
+          "inspectionNotes"
+        ],
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "deductions": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/Deduction"
+            }
+          },
+          "inspectionNotes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "FaqWrite": {
+        "required": [
+          "question",
+          "answer",
+          "category",
+          "sortOrder",
+          "isPublished"
+        ],
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "answer": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "category": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sortOrder": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "isPublished": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        }
+      },
+      "FareApproval": {
+        "required": [
+          "approvedFarePerPerson",
+          "assignedCoach",
+          "dispatchNotes",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "approvedFarePerPerson": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "assignedCoach": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dispatchNotes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "FindTicket": {
+        "required": [
+          "phone"
+        ],
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "HoldRequest": {
+        "required": [
+          "seatNumbers",
+          "sessionId"
+        ],
+        "type": "object",
+        "properties": {
+          "seatNumbers": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          "sessionId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "InitializeRequest": {
+        "required": [
+          "referenceType",
+          "referenceId",
+          "amount",
+          "currency",
+          "customerEmail",
+          "customerPhone",
+          "paymentNetwork"
+        ],
+        "type": "object",
+        "properties": {
+          "referenceType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "referenceId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "customerEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "customerPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "paymentNetwork": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "JoinGroup": {
+        "required": [
+          "name",
+          "phone",
+          "emergencyContact",
+          "paymentMethod",
+          "mobileMoneyProvider",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "emergencyContact": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "paymentMethod": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mobileMoneyProvider": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "LoginRequest": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "password": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "OperatorWrite": {
+        "required": [
+          "id",
+          "name",
+          "isVerified",
+          "isActive"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isVerified": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "isActive": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        }
+      },
+      "Organizer": {
+        "required": [
+          "name",
+          "phone",
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PassengerIn": {
+        "required": [
+          "fullName",
+          "phone",
+          "gender"
+        ],
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "gender": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "TerminalWrite": {
+        "required": [
+          "id",
+          "name",
+          "city",
+          "address",
+          "latitude",
+          "longitude",
+          "activeBayCount",
+          "marshalName",
+          "marshalPhone",
+          "isActive"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "city": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "address": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "latitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "activeBayCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "marshalName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "marshalPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isActive": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        }
+      },
+      "TripWrite": {
+        "required": [
+          "originCity",
+          "destinationCity",
+          "originStationId",
+          "destinationStationId",
+          "departureDate",
+          "departureTime",
+          "duration",
+          "basePrice",
+          "operatorId",
+          "vehicleType",
+          "totalSeatsCount",
+          "amenities",
+          "pickupLandmarks",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "originCity": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "destinationCity": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "originStationId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "destinationStationId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "departureDate": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "departureTime": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "duration": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "basePrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "operatorId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "vehicleType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "totalSeatsCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "amenities": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "pickupLandmarks": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "VehicleWrite": {
+        "required": [
+          "name",
+          "category",
+          "licensePlate",
+          "dailyPrice",
+          "weeklyPrice",
+          "securityDeposit",
+          "withDriverAllowed",
+          "selfDriveAllowed",
+          "driverFeePerDay",
+          "features",
+          "dvlaRoadworthinessExpiry",
+          "images"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "category": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "licensePlate": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dailyPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "weeklyPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "securityDeposit": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "withDriverAllowed": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "selfDriveAllowed": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "driverFeePerDay": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "features": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "dvlaRoadworthinessExpiry": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "images": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Operator token from POST /api/auth/login.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "System"
+    },
+    {
+      "name": "Admin"
+    },
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Trips"
+    },
+    {
+      "name": "Bookings"
+    },
+    {
+      "name": "Group Charters"
+    },
+    {
+      "name": "Vehicles"
+    },
+    {
+      "name": "Rentals"
+    },
+    {
+      "name": "Terminals"
+    },
+    {
+      "name": "Content"
+    },
+    {
+      "name": "Transport Operators"
+    },
+    {
+      "name": "Payments"
+    },
+    {
+      "name": "Development"
+    }
+  ]
+}

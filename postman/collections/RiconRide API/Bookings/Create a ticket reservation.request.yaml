@@ -1,0 +1,35 @@
+$kind: http-request
+description: Public. Creates a `pending_payment` booking and opens the payment; seats are released if unpaid after 15 minutes. Pass the `sessionId` used for hold-seat to convert held seats. `qrCodeData` stays null until paid.
+url: "{{baseUrl}}/api/bookings"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "tripId": "trip-acc-kum-01",
+      "selectedSeatNumbers": [
+        14,
+        15
+      ],
+      "passengers": [
+        {
+          "fullName": "Kwame Mensah",
+          "phone": "0539943305",
+          "gender": "male"
+        },
+        {
+          "fullName": "Akua Serwaa",
+          "phone": "0241002000",
+          "gender": "female"
+        }
+      ],
+      "paymentMethod": "momo",
+      "mobileMoneyNumber": "0539943305",
+      "mobileMoneyProvider": "MTN",
+      "sessionId": "sess_891273"
+    }
+settings: {}
+examples: ./.resources/Create a ticket reservation.resources/examples
+order: 1000

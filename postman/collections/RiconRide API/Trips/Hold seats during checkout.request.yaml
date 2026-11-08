@@ -1,0 +1,24 @@
+$kind: http-request
+description: Public. Locks seats for 10 minutes for `sessionId`. Re-posting replaces that session's holds. 409 lists `unavailableSeats`.
+url: "{{baseUrl}}/api/trips/:id/hold-seat"
+method: POST
+headers:
+  Content-Type: application/json
+pathVariables:
+  - key: id
+    value: trip-acc-kum-01
+    disabled: false
+    description: "(Required) "
+body:
+  type: json
+  content: |-
+    {
+      "seatNumbers": [
+        12,
+        13
+      ],
+      "sessionId": "sess_891273"
+    }
+settings: {}
+examples: ./.resources/Hold seats during checkout.resources/examples
+order: 6000

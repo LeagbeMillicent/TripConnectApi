@@ -1,0 +1,21 @@
+$kind: http-request
+description: "Public. `referenceType`: ticket | charter | rental; `referenceId` is the booking number, charter member id or rental number. The amount comes from the order; a different `amount` is rejected (422)."
+url: "{{baseUrl}}/api/payments/initialize"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "referenceType": "ticket",
+      "referenceId": "RC-2026-1234567",
+      "amount": 220,
+      "currency": "GHS",
+      "customerEmail": "customer@riconride.com",
+      "customerPhone": "0539943305",
+      "paymentNetwork": "MTN"
+    }
+settings: {}
+examples: ./.resources/Open (or retry) a payment.resources/examples
+order: 1000

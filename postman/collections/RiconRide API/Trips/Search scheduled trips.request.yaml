@@ -1,0 +1,13 @@
+$kind: http-request
+description: Public. Upcoming scheduled/boarding trips; `passengers` hides trips without enough free seats. Cities match case-insensitively.
+url: "{{baseUrl}}/api/trips?from=Accra&to=Kumasi&date=2026-12-12&passengers=2&operator=op-vip"
+method: GET
+queryParams:
+  from: Accra
+  to: Kumasi
+  date: 2026-12-12
+  passengers: "2"
+  operator: op-vip
+settings: {}
+examples: ./.resources/Search scheduled trips.resources/examples
+order: 1000

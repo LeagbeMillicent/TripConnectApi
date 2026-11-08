@@ -1,0 +1,27 @@
+$kind: http-request
+description: |-
+  CMS. Deactivating stops new trips under it; existing trips are unaffected. The id cannot change.
+
+  **Roles:** network_manager, system_admin.
+url: "{{baseUrl}}/api/operators/:id"
+method: PATCH
+headers:
+  Content-Type: application/json
+pathVariables:
+  - key: id
+    value: op-vip
+    disabled: false
+    description: "(Required) "
+body:
+  type: json
+  content: |-
+    {
+      "isActive": false
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Update a transport operator.resources/examples
+order: 3000

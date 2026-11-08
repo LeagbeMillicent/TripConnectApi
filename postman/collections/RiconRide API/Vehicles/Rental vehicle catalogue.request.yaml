@@ -1,0 +1,13 @@
+$kind: http-request
+description: "Public. Filters: `category` (SUV | Bus | Sedan | Pickup | Van), `driverOption` (self-drive | with-driver), `availability=available` with optional `startDate`/`endDate`. Vehicles with lapsed DVLA roadworthiness are never listed."
+url: "{{baseUrl}}/api/vehicles?category=SUV&driverOption=with-driver&availability=available&startDate=2026-12-01&endDate=2026-12-08"
+method: GET
+queryParams:
+  category: SUV
+  driverOption: with-driver
+  availability: available
+  startDate: 2026-12-01
+  endDate: 2026-12-08
+settings: {}
+examples: ./.resources/Rental vehicle catalogue.resources/examples
+order: 1000

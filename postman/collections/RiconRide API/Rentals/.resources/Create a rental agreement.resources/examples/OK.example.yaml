@@ -1,0 +1,30 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/rentals"
+  method: POST
+  body:
+    type: json
+    content: |-
+      {
+        "vehicleId": "<vehicle id from GET /api/vehicles>",
+        "startDate": "2026-12-01",
+        "endDate": "2026-12-08",
+        "pickupPoint": "Kotoka International Airport, Terminal 3",
+        "driverOption": "with-driver",
+        "customer": {
+          "name": "Yaw Asante",
+          "phone": "0551234567",
+          "email": "yaw@example.com"
+        },
+        "paymentMethod": "momo",
+        "mobileMoneyProvider": "MTN"
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/plain
+  body:
+    type: text
+    content: ""
+order: 1000

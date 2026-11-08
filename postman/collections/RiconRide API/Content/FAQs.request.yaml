@@ -1,0 +1,9 @@
+$kind: http-request
+description: Public. Published FAQs, optional `category` filter.
+url: "{{baseUrl}}/api/content/faqs?category=Payments"
+method: GET
+queryParams:
+  category: Payments
+settings: {}
+examples: ./.resources/FAQs.resources/examples
+order: 3000

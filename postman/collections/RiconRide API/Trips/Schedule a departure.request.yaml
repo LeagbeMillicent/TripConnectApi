@@ -1,0 +1,39 @@
+$kind: http-request
+description: |-
+  CMS. `departureTime` like `06:30 AM`, `duration` like `4h 30m`, `basePrice` in GH₵ (max 2 decimals).
+
+  **Roles:** dispatch_marshal, station_master, system_admin.
+url: "{{baseUrl}}/api/trips"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "originCity": "Accra",
+      "destinationCity": "Tamale",
+      "originStationId": "st-circle",
+      "destinationStationId": "st-tamale-central",
+      "departureDate": "2026-12-12",
+      "departureTime": "05:00 AM",
+      "duration": "9h 30m",
+      "basePrice": 240,
+      "operatorId": "op-stc",
+      "vehicleType": "Intercity Scania Touring (49-Seater)",
+      "totalSeatsCount": 49,
+      "amenities": [
+        "Air Conditioning",
+        "Luggage Hold"
+      ],
+      "pickupLandmarks": [
+        "Circle Overpass Bay 4"
+      ]
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Schedule a departure.resources/examples
+order: 2000

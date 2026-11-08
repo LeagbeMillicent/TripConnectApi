@@ -1,0 +1,14 @@
+$kind: http-request
+description: |-
+  The signed-in operator's profile and role.
+
+  **Roles:** system_admin, dispatch_marshal, station_master, gate_marshal, fleet_manager, network_manager, communications, executive.
+url: "{{baseUrl}}/api/auth/me"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Current operator.resources/examples
+order: 3000

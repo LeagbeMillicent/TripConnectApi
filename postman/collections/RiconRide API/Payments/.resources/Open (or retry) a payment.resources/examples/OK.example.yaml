@@ -1,0 +1,25 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/payments/initialize"
+  method: POST
+  body:
+    type: json
+    content: |-
+      {
+        "referenceType": "ticket",
+        "referenceId": "RC-2026-1234567",
+        "amount": 220,
+        "currency": "GHS",
+        "customerEmail": "customer@riconride.com",
+        "customerPhone": "0539943305",
+        "paymentNetwork": "MTN"
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/plain
+  body:
+    type: text
+    content: ""
+order: 1000

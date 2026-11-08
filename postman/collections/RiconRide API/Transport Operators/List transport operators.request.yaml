@@ -1,0 +1,7 @@
+$kind: http-request
+description: Public. Active operators. `rating` is null until a real review system exists.
+url: "{{baseUrl}}/api/operators"
+method: GET
+settings: {}
+examples: ./.resources/List transport operators.resources/examples
+order: 1000

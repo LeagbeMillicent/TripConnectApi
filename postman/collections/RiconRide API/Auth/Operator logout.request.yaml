@@ -1,0 +1,7 @@
+$kind: http-request
+description: Clears the session cookie. Bearer tokens simply expire.
+url: "{{baseUrl}}/api/auth/logout"
+method: POST
+settings: {}
+examples: ./.resources/Operator logout.resources/examples
+order: 2000

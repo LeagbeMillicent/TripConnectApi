@@ -1,0 +1,35 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/groups"
+  method: POST
+  body:
+    type: json
+    content: |-
+      {
+        "name": "KNUST Alumni Annual Homecoming Trip",
+        "tripType": "Church / Alumni",
+        "origin": "Accra (Circle Station)",
+        "destination": "Kumasi (KNUST Campus)",
+        "pickupLocation": "Legon Shell Landmark / University Gate",
+        "pickupCoordinates": {
+          "lat": 5.6508,
+          "lng": -0.187
+        },
+        "travelDate": "2026-12-25",
+        "preferredDepartureTime": "06:00 AM",
+        "targetTravelers": 30,
+        "organizer": {
+          "name": "Kofi Mensah Boateng",
+          "phone": "0539943305",
+          "email": "kofi@example.com"
+        }
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/plain
+  body:
+    type: text
+    content: ""
+order: 1000

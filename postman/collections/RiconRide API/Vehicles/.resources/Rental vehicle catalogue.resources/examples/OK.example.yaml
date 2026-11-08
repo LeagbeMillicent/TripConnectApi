@@ -1,0 +1,22 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/vehicles?category=SUV&driverOption=with-driver&availability=available&startDate=2026-12-01&endDate=2026-12-08"
+  method: GET
+  queryParams:
+    category: SUV
+    driverOption: with-driver
+    availability: available
+    startDate: 2026-12-01
+    endDate: 2026-12-08
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/plain
+  body:
+    type: text
+    content: ""
+order: 1000

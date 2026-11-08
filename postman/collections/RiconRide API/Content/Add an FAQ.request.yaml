@@ -1,0 +1,24 @@
+$kind: http-request
+description: |-
+  CMS.
+
+  **Roles:** communications, system_admin.
+url: "{{baseUrl}}/api/content/faqs"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "question": "Can I pay with Telecel Cash?",
+      "answer": "Yes. MTN MoMo, Telecel Cash, AT Money, Visa and Mastercard are accepted.",
+      "category": "Payments"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Add an FAQ.resources/examples
+order: 4000

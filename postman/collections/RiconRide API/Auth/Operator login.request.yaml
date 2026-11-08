@@ -1,0 +1,16 @@
+$kind: http-request
+description: Returns a bearer JWT and also sets the HttpOnly `rr_session` cookie (SameSite=Strict). 5 wrong passwords lock the account for 15 minutes (423).
+url: "{{baseUrl}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "admin@riconride.com",
+      "password": "dev-admin-pass-2026"
+    }
+settings: {}
+examples: ./.resources/Operator login.resources/examples
+order: 1000

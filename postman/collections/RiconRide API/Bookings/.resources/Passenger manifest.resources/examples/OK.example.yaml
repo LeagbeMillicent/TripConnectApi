@@ -1,0 +1,27 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/bookings?search=Kwame&status=confirmed&tripId=trip-acc-kum-01&date=2026-12-12&page=1&limit=25"
+  method: GET
+  headers:
+    - key: Authorization
+      value: Bearer <token>
+      description: "Added as a part of security scheme: bearer"
+  queryParams:
+    search: Kwame
+    status: confirmed
+    tripId: trip-acc-kum-01
+    date: 2026-12-12
+    page: "1"
+    limit: "25"
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: text/plain
+  body:
+    type: text
+    content: ""
+order: 1000

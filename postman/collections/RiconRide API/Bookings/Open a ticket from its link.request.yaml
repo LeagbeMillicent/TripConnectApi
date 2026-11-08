@@ -1,0 +1,14 @@
+$kind: http-request
+description: Public. The `token` from the SMS/WhatsApp link is required; wrong tokens get 404.
+url: "{{baseUrl}}/api/bookings/ticket/:bookingNumber?token=<token from the SMS link>"
+method: GET
+queryParams:
+  token: <token from the SMS link>
+pathVariables:
+  - key: bookingNumber
+    value: RC-2026-1234567
+    disabled: false
+    description: "(Required) "
+settings: {}
+examples: ./.resources/Open a ticket from its link.resources/examples
+order: 4000

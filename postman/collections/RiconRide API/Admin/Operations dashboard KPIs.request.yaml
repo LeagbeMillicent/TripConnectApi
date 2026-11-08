@@ -1,0 +1,14 @@
+$kind: http-request
+description: |-
+  CMS. Every figure is a count or sum of real rows: gross volume (all time, today), seats booked today, fleet in transit, pending fare approvals, payments awaiting refund.
+
+  **Roles:** executive, system_admin.
+url: "{{baseUrl}}/api/admin/dashboard-stats"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Operations dashboard KPIs.resources/examples
+order: 1000

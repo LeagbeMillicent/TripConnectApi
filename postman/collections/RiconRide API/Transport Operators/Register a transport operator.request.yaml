@@ -1,0 +1,23 @@
+$kind: http-request
+description: |-
+  CMS. `id` defaults to `op-<slug of name>`. Rating is not writable.
+
+  **Roles:** network_manager, system_admin.
+url: "{{baseUrl}}/api/operators"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Metro Mass Transit",
+      "isVerified": true
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Register a transport operator.resources/examples
+order: 2000

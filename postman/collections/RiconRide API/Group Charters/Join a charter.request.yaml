@@ -1,0 +1,24 @@
+$kind: http-request
+description: Public. Only after fare approval. Reserves a place for 15 minutes pending payment; one active place per phone.
+url: "{{baseUrl}}/api/groups/:id/join"
+method: POST
+headers:
+  Content-Type: application/json
+pathVariables:
+  - key: id
+    value: 4656b099-0469-2386-93ce-bbee75d60e70
+    disabled: false
+    description: "(Required) "
+body:
+  type: json
+  content: |-
+    {
+      "name": "Ama Osei",
+      "phone": "0539943305",
+      "emergencyContact": "0241002000",
+      "paymentMethod": "momo",
+      "mobileMoneyProvider": "MTN"
+    }
+settings: {}
+examples: ./.resources/Join a charter.resources/examples
+order: 4000

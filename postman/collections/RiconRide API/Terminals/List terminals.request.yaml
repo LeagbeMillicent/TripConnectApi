@@ -1,0 +1,9 @@
+$kind: http-request
+description: Public. Includes a Google Maps directions link and marshal contact.
+url: "{{baseUrl}}/api/terminals?city=Accra"
+method: GET
+queryParams:
+  city: Accra
+settings: {}
+examples: ./.resources/List terminals.resources/examples
+order: 1000

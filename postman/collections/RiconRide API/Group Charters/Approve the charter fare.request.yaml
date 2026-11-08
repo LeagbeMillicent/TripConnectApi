@@ -1,0 +1,30 @@
+$kind: http-request
+description: |-
+  CMS. Sets fare per person, coach and notes. `status`: planning | confirmed | cancelled. The fare is locked once anyone has joined.
+
+  **Roles:** dispatch_marshal, system_admin.
+url: "{{baseUrl}}/api/groups/:id/fare-approval"
+method: PATCH
+headers:
+  Content-Type: application/json
+pathVariables:
+  - key: id
+    value: 4656b099-0469-2386-93ce-bbee75d60e70
+    disabled: false
+    description: "(Required) "
+body:
+  type: json
+  content: |-
+    {
+      "approvedFarePerPerson": 145,
+      "assignedCoach": "30-Seater Coaster Bus with AC",
+      "dispatchNotes": "Assigned executive shuttle. Fuel allowance and driver per diem covered.",
+      "status": "planning"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Approve the charter fare.resources/examples
+order: 2000
